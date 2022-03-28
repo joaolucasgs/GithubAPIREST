@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title> Github Explorer </title>
+    <link rel="stylesheet" href="assets/css/material.css">
+    <link rel="stylesheet" href="assets//css/animate.css">
+    <style>
+        .cards-container {
+        column-break-inside: avoid;
+        }
+        .cards-container .card {
+        display: inline-block;
+        overflow: visible;
+        }
+
+        @media only screen and (max-width: 600px) {
+        .cards-container {
+            -webkit-column-count: 2;
+            -moz-column-count: 2;
+            column-count: 2;
+        }
+        }
+        @media only screen and (min-width: 601px) {
+        .cards-container {
+            -webkit-column-count: 3;
+            -moz-column-count: 3;
+            column-count: 3;
+        }
+        }
+        @media only screen and (min-width: 993px) {
+        .cards-container {
+            -webkit-column-count: 4;
+            -moz-column-count: 4;
+            column-count: 4;
+        }
+        }
+        .text-center {
+        text-align: center;
+        }
+</style>
+</head>
+<body>
+
+
+<nav>
+    <div class="nav-wrapper">
+        <a id="_headerName" class="brand-logo center">Github API</a>
+        <ul id="nav-mobile" class="left hide-on-med-and-down">
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col s12 m8">
+        <table class="striped">
+          <br>
+           
+          </table>
+            <hr>
+          <h3>Repositorio desejado</h3>     
+        </div>
+        <div class="col s12 m4">
+            <br>
+            <img id="_userImage" width="100%" src="https://cataas.com/cat/says/your face here">
+        </div>
+    </div>
+</div>
+<div id="repoList" class="cards-container"></div>
+
+</body>
+<script src="./assets/js/jquery.js"></script>
+<script src="./assets/js/material.js"></script>
+<script>
+    $(document).ready(()=>{
+
+        var username = prompt("Digite o usuario desejado : ");
+        var repo = prompt("Digite o repositorio desejado : ");
+        if(!username){
+            alert("Refresh");
+        }
+
+        // Requesição da API
+        $.ajax({
+            url:"https://api.github.com/users/"+username,
+            success:(res)=>{
+                $("#_headerName").html(res.name);
+                $("#_name").html(res.name);
+                $("#_bio").html(res.bio);
+                // $("#_followers").html(res.followers);
+                $("#_followers").html('<img src="https://img.shields.io/badge/Followers-'+res.followers+'-lightgrey" alt="GitHub followers" />&nbsp;')
+                $("#_followers").append('<img src="https://img.shields.io/badge/Following-'+res.following+'-lightgrey" alt="GitHub following" />&nbsp;')
+                $("#_followers").append('<img src="https://img.shields.io/badge/Total Repositories-'+res.public_repos+'-lightgrey" alt="GitHub repositories"></p>');
+                $("#_userImage").attr("src", res.avatar_url);
+                // console.log(res);
+            }
+        });
+
+        function delay(counter){
+            return " delay-"+((counter%3)+1)+"s ";
+        }
+
+        // Mostrar repositorio desejado
+        $.ajax({
+            url:"https://api.github.com/users/"+username+"/repos",
+            success:(res)=>{
+                // console.log(res);
+                var counter = 1;
+                var rowStart = 0;
+                res.forEach((x)=>{
+                    if(x.description==null){
+                    x.description = "Leia o código para saber mais, descrição invalida";
+                    }
+                    var str = "";
+                    // str += '<div class="row">';
+                        if(x.name==repo){
+                        str += '<div class="col s12 ';
+                        str += ['m3','m3'][Math.floor(Math.random()*10)%2];
+                        str += '">';
+                        str += '<div class="card animated fadeInUp';
+                        str += delay(counter);
+                        str += '"><div class="card-image"><img src="'+'https://cataas.com/cat/says/I worked on '+x.name+'">';
+                        str += '</div><div class="card-content"><span class="card-title">';
+                        str += x.name+'</span>';    
+                        str += '<p>'+x.description+'</p>';
+                        str += '</div><div class="card-action">';
+                        str += '<img src="https://img.shields.io/github/last-commit/'+username+'/'+x.name+'" alt="GitHub last commit" /><br />'
+                        str += '<a href="'+x.html_url+'">Acessar no GITHUB</a>';
+                        str += '</div></div></div>';
+                }
+                
+
+                    counter = counter + 1;
+                    $("#repoList").append(str);
+                    // console.log(x);
+                })
+            }
+        });
+    })
+</script>
+</html>
